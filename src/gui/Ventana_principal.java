@@ -94,8 +94,7 @@ public class Ventana_principal extends JFrame
 		JPanel PanelCasillas = new JPanel();
 		PanelCasillas.setBounds(5, 98, 779, 462);
 		Principial.add(PanelCasillas);
-		PanelCasillas.setLayout(new GridLayout(3, 3, 0, 0));
-		//PanelCasillas.setLayout(new GridLayout(juego.getCantFilaSubPanel(), juego.getCantFilaSubPanel(), 0, 0));
+		PanelCasillas.setLayout(new GridLayout(juego.getCantFilaSubPanel(), juego.getCantFilaSubPanel(), 0, 0));
 
 		
 		
