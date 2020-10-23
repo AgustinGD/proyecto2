@@ -76,7 +76,7 @@ public class Ventana_principal extends JFrame
 		
 		// Inicializacion de componentes
 		JPanel PanelTiempo = new JPanel();
-		PanelTiempo.setBounds(5, 11, 779, 76);
+		PanelTiempo.setBounds(5, 11, 779, 80);
 		Principial.add(PanelTiempo);
 		PanelTiempo.setLayout(null);
 		
@@ -94,56 +94,23 @@ public class Ventana_principal extends JFrame
 		JPanel PanelCasillas = new JPanel();
 		PanelCasillas.setBounds(5, 98, 779, 462);
 		Principial.add(PanelCasillas);
-		PanelCasillas.setLayout(new GridLayout(juego.getCantFilaSubPanel(), juego.getCantFilaSubPanel(), 0, 0));
+		PanelCasillas.setLayout(new GridLayout(3, 3, 0, 0));
+		//PanelCasillas.setLayout(new GridLayout(juego.getCantFilaSubPanel(), juego.getCantFilaSubPanel(), 0, 0));
 
 		
 		
-		// Inicializacion del boton chequear y listo
+		// Variables de los botones
 		JButton btnChequearSolucion = new JButton("Chequear solucion");
 		JButton btnListo = new JButton("Listo");
-		btnChequearSolucion.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e)
-			{
-				if(juego.gano())
-				{
-					timer.stop();					
-					labelEstado.setForeground(Color.GREEN);
-					btnListo.setEnabled(false);
-				}
-				else
-				{
-					btnListo.setEnabled(true);
-				}
-				
-				labelEstado.setText(juego.getEstadoDelJuego());
-				btnChequearSolucion.setEnabled(false);
-				
-				PanelCasillas.repaint();				
-			}
-		});
-		btnChequearSolucion.setBounds(37, 16, 174, 23);
-		PanelTiempo.add(btnChequearSolucion);		
+		JButton btnIniciar = new JButton("Iniciar");
+		JButton btnReiniciar = new JButton("Reiniciar");		
 		
-		btnListo.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e)
-			{
-				juego.refrescarConflictos();
-				btnListo.setEnabled(false);
-				btnChequearSolucion.setEnabled(true);				
-				
-				labelEstado.setText(juego.getEstadoDelJuego());
-				PanelCasillas.repaint();				
-			}
-		});
-		btnListo.setBounds(37, 42, 174, 23);
-		PanelTiempo.add(btnListo);
-		
+		// Variables del subpanel
+		int cantPaneles = 3;
 		JPanel panelReloj = new JPanel();
-		panelReloj.setBounds(277, 11, 218, 54);
-		PanelTiempo.add(panelReloj);
-		panelReloj.setLayout(new GridLayout(0, 3, 0, 0));				
+		panelReloj.setBounds(267, 11, 225, 43);
+		PanelTiempo.add(panelReloj);		
+		panelReloj.setLayout(new GridLayout(0, cantPaneles, 0, 0));				
 		
 		// Inicializacion de los subpaneles
 		int m,n;
@@ -225,9 +192,8 @@ public class Ventana_principal extends JFrame
 		
 		// Inicializacion de los digitos del timer
 		JPanel panelesDigitos[]= new JPanel[3];
-		EntidadReloj digitos[] = new EntidadReloj[6];	
+		EntidadReloj digitos[] = new EntidadReloj[6];		
 		
-		int cantPaneles = 3;
 		int cantDigitos = 6;
 		int cantDigitosEnSubPanel = 2;
 		
@@ -272,27 +238,110 @@ public class Ventana_principal extends JFrame
 		{
         	public void actionPerformed(ActionEvent evt)
         	{
-        		Duration d = juego.tiempoActual();
-        		
-        		String hms = String.format("%02d%02d%02d", 
-		                d.toHours(), 
-		                d.toMinutesPart(), 
-		                d.toSecondsPart());
-        		
-        		for (int i = 0; i < digitos.length; i++)
-        		{	
-        			digitos[i].actualizar((int) hms.charAt(i) - '0');		            			
-        		}
-        		
+        		refrescarDigitos(digitos);
         		panelReloj.repaint();
         	}
 		});		
 		
+		// Inicializacion del boton chequear
+		btnChequearSolucion.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				if(juego.gano())
+				{
+					timer.stop();					
+					labelEstado.setForeground(Color.GREEN);
+					btnListo.setEnabled(false);
+				}
+				else
+				{
+					btnListo.setEnabled(true);
+				}
+				
+				labelEstado.setText(juego.getEstadoDelJuego());
+				btnChequearSolucion.setEnabled(false);
+				
+				PanelCasillas.repaint();				
+			}
+		});
+		btnChequearSolucion.setBounds(37, 16, 174, 23);
+		PanelTiempo.add(btnChequearSolucion);
 		
-		// Muestreo de botones segun estado del juego
+		// Inicializacion del boton listo
+		btnListo.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				juego.refrescarConflictos();
+				btnListo.setEnabled(false);
+				btnChequearSolucion.setEnabled(true);				
+				
+				labelEstado.setText(juego.getEstadoDelJuego());
+				PanelCasillas.repaint();				
+			}
+		});
+		btnListo.setBounds(37, 42, 174, 23);
+		PanelTiempo.add(btnListo);
+		
+		// Inicializacion del boton iniciar
+		btnIniciar.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				btnIniciar.setEnabled(false);
+				btnReiniciar.setEnabled(true);
+				btnChequearSolucion.setEnabled(true);
+				PanelCasillas.setVisible(true);
+				juego.iniciarJuego();
+				labelEstado.setForeground(Color.BLUE);
+				labelEstado.setText(juego.getEstadoDelJuego());
+				
+				
+				juego.reiniciarTiempo();
+				timer.start();
+			}
+		});
+		btnIniciar.setBounds(284, 57, 89, 23);
+		PanelTiempo.add(btnIniciar);
+		
+		// Inicializacion del boton reiniciar
+		btnReiniciar.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				timer.stop();
+								
+				btnReiniciar.setEnabled(false);
+				btnIniciar.setEnabled(true);
+				btnChequearSolucion.setEnabled(false);
+				btnListo.setEnabled(false);
+				labelEstado.setForeground(Color.ORANGE);
+				PanelCasillas.setVisible(false);
+				
+				juego.reiniciarJuego();
+				labelEstado.setText(juego.getEstadoDelJuego());
+				
+				juego.reiniciarTiempo();
+				refrescarDigitos(digitos);
+        		panelReloj.repaint();				
+			}
+		});
+		btnReiniciar.setBounds(384, 57, 89, 23);
+		PanelTiempo.add(btnReiniciar);
+		
+		// Inicio generico de los botones y label
+		btnListo.setEnabled(false);
+		btnChequearSolucion.setEnabled(false);
+		btnReiniciar.setEnabled(false);
+		labelEstado.setForeground(Color.ORANGE);
+		labelEstado.setText(juego.getEstadoDelJuego());
+		PanelCasillas.setVisible(false);
+		
+		// Muestreo de botones y label segun estado del juego
 		if (!juego.iniciadoCorrecto())
 		{
-			btnChequearSolucion.setEnabled(false);
+			btnIniciar.setEnabled(false);			
 			labelEstado.setForeground(Color.RED);
 			
 			JTextArea taError = new JTextArea(3, 30);
@@ -303,13 +352,21 @@ public class Ventana_principal extends JFrame
 			taError.setEditable(false);
             
 			JOptionPane.showMessageDialog(null, new JScrollPane(taError) , "Error: ", JOptionPane.ERROR_MESSAGE);
-		}
-		else
-		{
-			timer.start();
-		}
+		}				
+	}
+	
+	private void refrescarDigitos(EntidadReloj digitos[])
+	{
+		Duration d = juego.tiempoActual();
 		
-		btnListo.setEnabled(false);
-		labelEstado.setText(juego.getEstadoDelJuego());		
+		String hms = String.format("%02d%02d%02d", 
+                d.toHours(), 
+                d.toMinutesPart(), 
+                d.toSecondsPart());
+		
+		for (int i = 0; i < digitos.length; i++)
+		{	
+			digitos[i].actualizar((int) hms.charAt(i) - '0');		            			
+		}		
 	}
 }

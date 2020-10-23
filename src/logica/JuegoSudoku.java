@@ -25,6 +25,7 @@ public class JuegoSudoku
 	private int estado;
 	private String[] estado_del_juego;
 	private LocalTime start;
+	private String ruta;
 	
 	// Constructor
 	/**
@@ -32,10 +33,11 @@ public class JuegoSudoku
 	 * Se blanquean al azar entre 9 y 40 celdas.
 	 * @param ruta ruta del archivo que se utiliza para iniciar las celdas.
 	 */
-	public JuegoSudoku(String ruta)
+	public JuegoSudoku(String path)
 	{
+		ruta = path;
 		tablero = new Celda[9][9];
-		estado_del_juego = new String[]{"Error (archivo)", "Ganaste", "En progreso", "En progreso (hay conflictos)", "En progreso (tablero incompleto)"};
+		estado_del_juego = new String[]{"Error (archivo)", "Ganaste", "En pausa", "En progreso (hay conflictos)", "En progreso (tablero incompleto)","En progreso"};
 		
 		// Numero al azar entre 9-40 para remover celdas.
 		Random rand = new Random();
@@ -43,9 +45,9 @@ public class JuegoSudoku
 		
 		if(iniciarLectura(ruta) && validarSudoku())
 		{			
-			estado = 2;
 			agregarCeros(agregar_random);			
-			refrescarConflictos();			
+			refrescarConflictos();
+			estado = 2;
 		}
 		else
 		{
@@ -384,7 +386,7 @@ public class JuegoSudoku
 	 */
 	public void refrescarConflictos()
 	{	
-		estado = 2;
+		estado = 5;
 		
 		for(int i=0; i<9; i++)
 		{
@@ -487,5 +489,53 @@ public class JuegoSudoku
 				tablero[i][j].setValor(j+1);
 			}
 		}	
+	}
+	/**
+	 * Reinicia el tablero, agregando blancos al azar denuevo. y el estado del juego.
+	 * Asume que el tablero habia iniciado de manera correcta previamente
+	 */
+	public void reiniciarJuego()
+	{
+		int valor;
+		Scanner escaner = null;
+		estado = 2;
+		
+		InputStream in = JuegoSudoku.class.getClassLoader().getResourceAsStream(ruta);			
+		escaner = new Scanner(in);	
+	
+		for(int i=0; i<9; i++)
+		{
+			for(int j=0; j<9; j++)
+			{
+				valor = Integer.parseInt(escaner.next());
+				
+				if(valor != 0)
+				{
+					tablero[i][j].setActivado(false);
+					tablero[i][j].setEstado(0);
+				}
+				else
+				{
+					tablero[i][j].setActivado(true);
+					tablero[i][j].setEstado(1);
+				}				
+				
+				tablero[i][j].setValor(valor);					
+			}
+		}
+		
+		escaner.close();
+		
+		// Numero al azar entre 9-40 para remover celdas.
+		Random rand = new Random();
+		int agregar_random = rand.nextInt(32) + 9;
+		agregarCeros(agregar_random);
+	}
+	/**
+	 * Setea el estado al de un juego en progreso
+	 */
+	public void iniciarJuego()
+	{
+		estado = 5;
 	}
 }
